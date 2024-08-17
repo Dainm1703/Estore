@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{views/Admin/MainAdmin.html}">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estore</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/img/favicon.ico}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <!-- Include common head -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        form {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto 15px auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="file"],
+        textarea,
+        select {
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="file"] {
+            padding: 5px;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .button-container button {
+            margin: 0 5px; /* Khoảng cách giữa các nút */
+        }
+
+        .img-thumbnail {
+            max-width: 100%;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            object-fit: cover;
+        }
+
+        @media (max-width: 600px) {
+            form {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+
+        #SanPham_Table {
+            width: 100%;
+            border-collapse: collapse; /* Loại bỏ khoảng cách giữa các ô */
+            margin-top: 20px;
+        }
+
+        #SanPham_Table th, #SanPham_Table td {
+            border: 1px solid #ff0000; /* Đường viền cho ô */
+            padding: 8px; /* Khoảng cách bên trong ô */
+            text-align: left; /* Canh trái */
+        }
+
+        #SanPham_Table th {
+            background-color: #f2f2f2; /* Màu nền cho tiêu đề */
+            color: black; /* Màu chữ cho tiêu đề */
+        }
+
+        #SanPham_Table tr {
+            background-color: #31a58d; /* Màu nền cho các hàng chẵn */
+        }
+
+        #SanPham_Table tr:hover {
+            background-color: #b62689; /* Màu nền khi di chuột qua */
+        }
+
+        #SanPham_Table th {
+            padding-top: 12px; /* Khoảng cách bên trên cho ô tiêu đề */
+            padding-bottom: 12px; /* Khoảng cách bên dưới cho ô tiêu đề */
+            text-align: left;
+            background-color: #4CAF50; /* Màu nền cho tiêu đề */
+            color: white; /* Màu chữ cho tiêu đề */
+        }
+
+        /* Tab Navigation Styles */
+        .tab {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            margin-right: 10px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 10px 15px;
+            color: #007bff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        select option {
+            color: black;
+        }
+
+        .pagination {
+            background: #f2f2f2;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center; /* căn giữa theo chiều ngang */
+            align-items: center; /* căn giữa theo chiều dọc */
+        }
+
+        .page {
+            display: inline-block;
+            padding: 0px 9px;
+            margin-right: 4px;
+            border-radius: 3px;
+            border: solid 1px #c0c0c0;
+            background: #e9e9e9;
+            box-shadow: inset 0px 1px 0px rgba(255,255,255, .8), 0px 1px 3px rgba(0,0,0, .1);
+            font-size: .875em;
+            font-weight: bold;
+            text-decoration: none;
+            color: #717171;
+            text-shadow: 0px 1px 0px rgba(255,255,255, 1);
+        }
+
+        .page.active {
+            border: none;
+            background: #616161;
+            box-shadow: inset 0px 0px 8px rgba(0,0,0, .5), 0px 1px 0px rgba(255,255,255, .8);
+            color: #f0f0f0;
+            text-shadow: 0px 0px 3px rgba(0,0,0, .5);
+        }
+
+        .fa-solid {
+            scale: 1;
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body id="productHTML">
+<article layout:fragment="content">
+    <div class="tab">
+        <ul class="nav">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" th:href="@{/admin/san-pham}">Sản phẩm</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/admin/danh-muc-san-pham}">Danh mục sản phẩm</a>
+            </li>
+        </ul>
+    </div>
+    <h1 class="h2 mb-3 mt-2 text-dark d-flex justify-content-center align-items-center">Thông tin sản phẩm</h1>
+    <form action="#" enctype="multipart/form-data" id="admin_product">
+        <div class="w-100">
+            <div class="form-group">
+                <label for="anhSP">Ảnh sản phẩm:</label>
+                <img th:src="@{https://res.cloudinary.com/dtnf47wll/image/upload/noImage.png}" id="anhSP" height="300px" width="400px"/>
+                <input type="file" name="fileInput" id="fileInput" hidden>
+            </div>
+        </div>
+        <div class="w-100">
+            <div class="form-group">
+                <label for="maSanPham">Mã sản phẩm:</label>
+                <input type="text" id="maSanPham" disabled>
+            </div>
+            <div class="form-group">
+                <label for="tenSanPham">Tên sản phẩm:</label>
+                <input type="text" id="tenSanPham"  required>
+            </div>
+            <div class="form-group">
+                <label for="danhMucSanPham">Danh mục sản phẩm:</label>
+                <select id="danhMucSanPham" >
+<!--                    <option value="" selected></option>-->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="Sl_SP">Số lượng:</label>
+                <input type="number" min="1"  id="Sl_SP" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="donGiaBan">Đơn giá bán:</label>
+            <input type="text" id="donGiaBan" >
+        </div>
+        <div class="form-group">
+            <label for="size">Kích cỡ:</label>
+            <input type="text" id="size" >
+        </div>
+        <div class="form-group full-width">
+            <label for="ghiChu">Ghi chú:</label>
+            <textarea id="ghiChu"  rows="5"></textarea>
+        </div>
+    </form>
+    <div class="button-container">
+        <button type="button" class="btn btn-outline-success" id="createSP">Create</button>
+        <button type="button" class="btn btn-outline-success" id="clearSP">Clear</button>
+        <button type="button" class="btn btn-outline-success" id="updateSP">Update</button>
+<!--        <button type="button" class="btn btn-outline-success" id="demo">Demo</button>-->
+    </div>
+    <div>
+        <select id="pageSize">
+            <option value="5" selected>5</option>
+            <option value="10">10</option>
+            <option value="100">30</option>
+        </select>
+        <span class="mx-5" id="order">
+            <i class="fa-solid fa-arrow-down-a-z"></i>
+        </span>
+    </div>
+    <table class="col-md-12" id="SanPham_Table">
+        <thead>
+        <tr>
+            <th class="ad_masp">Mã sản phẩm</th>
+            <th class="ad_tenSP">Tên sản phẩm</th>
+            <th class="ad_soLuong">Số lượng tồn kho</th>
+            <th class="ad_giaBan">Đơn giá bán</th>
+            <th class="ad_ghiChu">Ghi chú</th>
+            <th class="ad_maDM">Danh mục</th>
+            <th class="ad_Size">Size</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <div class="pagination" id="paginationSP"></div>
+    <script th:src="@{/assets/admin/js/admin-sanpham.js}"></script>
+</article>
+</body>
+</html>

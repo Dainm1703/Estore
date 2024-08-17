@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{views/Admin/MainAdmin.html}" >
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estore</title>
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/img/favicon.ico}">
+    <!-- Include common head -->
+    <th:block th:replace="/common/head :: head"></th:block>
+    <style>
+        a {
+            color: black!important;
+            text-decoration: none!important;
+        }
+        .form-check-inline {
+            display: flex;
+            margin-top: 10px;
+        }
+        .form-check {
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+        }
+        .button-container button {
+            margin: 0 5px; /* Khoảng cách giữa các nút */
+        }
+        table.col-md-12 {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #3f76ba;
+        }
+
+        table.col-md-12 th, table.col-md-12 td {
+            border: 1px solid #000000;
+            padding: 8px;
+        }
+
+        table.col-md-12 th {
+            text-align: center;
+            color: #FFFFFF;
+        }
+
+        table.col-md-12 tr {
+            display: flex;
+            text-align: center;
+            color: #FFFFFF
+        }
+
+        table.col-md-12 td, table.col-md-12 th {
+            flex: 1;
+            min-width: 0;
+        }
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+<article layout:fragment="content">
+    <div class="container-fluid mb-4" >
+        <div class="row">
+            <div class="col-12">
+                <form enctype="multipart/form-data" id="nhanVienAdmin">
+                    <input name="__RequestVerificationToken" type="hidden">
+                    <h1 class="h2 mb-3 mt-2 text-dark d-flex justify-content-center align-items-center">Thông tin nhân viên</h1>
+                    <div class="p-3 p-lg-5 border">
+
+                        <div class="form-group row">
+                            <div class="col-md-6">
+                                <label for="MANV" class="text-black">Mã nhân viên <span class="text-danger">*</span></label>
+                                <input type="text" class="required form-control" id="MANV" disabled>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="Gender" class="form-label">Giới tính <span class="text-danger">*</span></label>
+                                <select id="Gender" class="form-select" aria-label="Default select example">
+                                    <option value="1" selected>Nam</option>
+                                    <option value="2">Nữ</option>
+                                </select>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-6">
+                                <label for="FullName" class="text-black">Tên nhân viên <span class="text-danger">*</span></label>
+                                <input type="text" class="required form-control" id="FullName" >
+                            </div>
+                            <div class="col-md-6">
+                                <label for="Brithday" class="text-black">Ngày sinh <span class="text-danger">*</span></label>
+                                <input type="date" class="required form-control" id="Brithday" name="Brithday" placeholder="MM/DD/YYYY">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-6">
+                                <label for="Phone" class="text-black">Số điện thoại <span class="text-danger">*</span></label>
+                                <input type="text" class="required form-control" id="Phone" >
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="Password" class="text-black">Mật khẩu <span class="text-danger">*</span></label>
+                                        <input type="password" class="required form-control" id="Password" >
+                                    </div>
+<!--                                    <div class="col-md-6">-->
+<!--                                        <label for="Password1" class="text-black">Nhập lại mật khẩu <span class="text-danger">*</span></label>-->
+<!--                                        <input type="password" class="required form-control" id="Password1" >-->
+<!--                                    </div>-->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-6">
+                                <label for="Address" class="text-black">Địa chỉ <span class="text-danger">*</span></label>
+                                <input type="text" class="required form-control" id="Address" >
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-black">Vai trò <span class="text-danger">*</span></label>
+                                <div class="form-check-inline">
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" id="RoleNV" name="role_radio" checked>
+                                        <label class="form-check-label" for="RoleNV">Nhân viên</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" id="RoleQL" name="role_radio">Quản lý
+                                        <label class="form-check-label" for="RoleQL"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="button-container">
+                            <button type="button" class="btn btn-outline-success roleAdminNot" sec:authorize="!hasRole('ADMIN')" >Creat</button>
+                            <button type="button" class="btn btn-outline-success" sec:authorize="hasRole('ADMIN')" id="btnCreate">Creat</button>
+                            <button type="button" class="btn btn-outline-success"  id="btnClear">Clear</button>
+                            <button type="button" class="btn btn-outline-success roleAdminNot" sec:authorize="!hasRole('ADMIN')"  >Update</button>
+                            <button type="button" class="btn btn-outline-success roleAdminNot" sec:authorize="!hasRole('ADMIN')" >Delete</button>
+
+                            <button type="button" class="btn btn-outline-success" sec:authorize="hasRole('ADMIN')"  id="btnUpdate">Update</button>
+                            <button type="button" class="btn btn-outline-success" sec:authorize="hasRole('ADMIN')" id="btnDelete">Delete</button>
+                        </div>
+                        <br>
+                        <h2 class="h3 mb-3 mt-4 text-black d-flex justify-content-center align-items-center">Danh sách</h2>
+                    </div>
+                </form>
+                <table id="employeeTable" class="col-md-12" border="1">
+                    <thead>
+                    <tr>
+                        <th>MSNV</th>
+                        <th>FullName</th>
+                        <th>Gender</th>
+                        <th>Address</th>
+                        <th>Phone</th>
+                        <th>Birthday</th>
+<!--                        <th>Password</th>-->
+                        <th>Role</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/assets/admin/js/admin-nhanvien.js}"></script>
+</article>
+
+
+
+
+</body>
+</html>

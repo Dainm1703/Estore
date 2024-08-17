@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estore</title>
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/user/img/favicon.ico}">
+  <!--Bootstrap -->
+  <link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css}" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <script th:src="@{https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js}"
+          integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+          crossorigin="anonymous"></script>
+
+  <!-- insert common head -->
+  <th:block th:insert="/common/head :: head"></th:block>
+  <style>
+    a {
+      color: black!important;
+    }
+  </style>
+</head>
+<body>
+<div class="com" th:insert="~{/common/header :: header}"></div>
+<main layout:fragment="index" id="s">
+  <h1>Tìm kiếm sản phẩm: </h1>
+  <div class="tab-content" id="nav-tabContent">
+    <!-- card one -->
+    <div class="tab-pane fade show active" id="nav-home"
+         role="tabpanel" aria-labelledby="nav-home-tab">
+      <div class="row w-100" id="product-container">
+        <!-- Sản phẩm sẽ được hiển thị ở đây -->
+      </div>
+      <div class="pagination"  id="pagination-san-pham">
+      </div>
+    </div>
+  </div>
+  <div th:replace="/common/footer :: footer"></div>
+  <div th:fragment="introduce"></div>
+</main>
+</body>
+<script>
+
+  $(document).ready(function() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var key = urlParams.get('key');
+    function hienThiSPTimKiem(key) {
+      $('#pagination-san-pham').pagination({
+        dataSource: function(done){
+          $.ajax({
+            url: "/api/san-pham/"+key,
+            type: 'GET',
+            success: function(response) {
+
+              done(response);
+            },
+            error: function(error) {
+              // Hàm được gọi khi request thất bại
+              console.error('Lỗi khi gọi API:', error);
+            }
+          });
+        },
+        afterPaging : function() {
+          $('#btnSearchSP').get(0).scrollIntoView({ behavior:'smooth' });
+        },
+        pageSize: 6,
+        autoHidePrevious: true,
+        autoHideNext: true,
+        prevText: '&laquo; Trước',
+        nextText: 'Sau &raquo;',
+
+        callback: function(data, pagination) {
+          renderProducts(data);
+        }
+      })
+
+    }
+    if (key) {
+      hienThiSPTimKiem(key)
+    }
+
+    // Hàm để hiển thị sản phẩm
+    function renderProducts(products) {
+      var productsContainer = $('#product-container');
+      productsContainer.empty();
+
+      if (products.length == 0) {
+        var productHTML = `
+                        <div class="col-xl-4 col-lg-4 col-md-6 text-center">
+                           <strong>Không tìm thấy sản phẩm</strong>
+                        </div>
+                    `;
+
+        productsContainer.append(productHTML);
+        return;
+      }
+      products.forEach(function(product) {
+        var productHTML = `
+                        <div class="col-xl-4 col-lg-4 col-md-6">
+                            <div class="single-product mb-60">
+                                <div class="product-img">
+                                    <img src="https://res.cloudinary.com/dtnf47wll/image/upload/${product.anh}" alt="${product.tenSP}" width="500px" height="500px">
+
+                                </div>
+                                <div class="product-caption">
+                                    <div class="product-ratting">
+
+                                    </div>
+                                    <h4><a href="/product?maSP=${product.maSP}">${product.tenSP}</a></h4>
+                                    <div class="price">
+                                        <ul>
+                                            <li>${product.giaBan}</li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+        // Thêm sản phẩm vào container
+        productsContainer.append(productHTML);
+      });
+    }
+    $('#btnSearchSP').on('click', function(event){
+      var keyWord = $('#SearchSP').val();
+// Nếu từ khóa trống, hiển thị thông báo không tìm thấy sản phẩm
+      if (keyWord === "" || keyWord.length === 0) {
+        var productsContainer = $('#product-container');
+        productsContainer.empty();
+        var productHTML = `
+        <div class="col-xl-4 col-lg-4 col-md-6 text-center">
+          <strong>Không tìm thấy sản phẩm</strong>
+        </div>
+      `;
+        productsContainer.append(productHTML);
+      }
+
+      var newUrl = new URL(window.location);
+      newUrl.searchParams.set('key', keyWord);
+      window.history.pushState({}, '', newUrl);// thay đổi URL mà không tải lại trang.
+      hienThiSPTimKiem(keyWord)
+    })
+    $('img').on('error', function() {
+      $(this).attr('src', 'https://res.cloudinary.com/dtnf47wll/image/upload/noImage.png');
+    });
+  });
+</script>
+</html>
